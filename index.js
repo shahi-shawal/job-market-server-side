@@ -31,6 +31,7 @@ async function run() {
     const database = client.db("JobpostingDB");
     const jobCollection = database.collection("haiku");
     const jobtypeCollection = database.collection("jobtype")
+    const applyCollection = database.collection("applyJob")
 //    add a job data 
    app.post("/jobs", async(req, res)=>{
     const jobs= req.body
@@ -106,6 +107,14 @@ async function run() {
     console.log(result);
     res.send(result);
   })
+
+  // apply job 
+  app.post("/applyJobs", async(req, res)=>{
+    const jobs= req.body
+    console.log(jobs)
+    const result = await applyCollection.insertOne(jobs)
+    res.send(result)
+   })
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
