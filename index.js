@@ -58,7 +58,7 @@ async function run() {
     res.send(result);
   });
    
-   app.get("/jobs/:jb_category", async(req, res)=>{
+   app.get("/jobs/01/:jb_category", async(req, res)=>{
         const jobCat = req.params.jb_category
         const query = {jb_category:jobCat}
         const result = await jobCollection.find(query).toArray()
@@ -96,6 +96,21 @@ async function run() {
     res.send(result);
   });
 
+  // update applicats
+  // let totalSum = 0;
+  // app.put("/jobs/:id", async (req, res) => {
+  //   const id = req.params.id;
+  //   const filter = { _id: new ObjectId(id) };
+  //   const updatedUSer = 
+  //   { $inc:{job_applicate_number: 1}  }
+  //   const result = await jobCollection.updateOne(
+  //     filter,
+  //     updatedUSer
+  //   );
+  //   console.log(result);
+  //   res.send(result);
+  // });
+
   // Delete id 
 
   app.delete("/jobs/:id", async(req, res)=>{
@@ -113,9 +128,24 @@ async function run() {
     const jobs= req.body
     console.log(jobs)
     const result = await applyCollection.insertOne(jobs)
-    res.send(result)
+    console.log(result.insertedCount);
+    
+     if(result.insertedCount===1){
+      await jobCollection.updateOne(
+        { _id: new ObjectId (jobs.jobId) },
+        { $inc: { job_applicate_number: 1 } }
+   )
+     }
+      res.send(result)
+    
    })
 
+  //  apply job get 
+
+  app.get("/applyjobs", async(req, res)=>{
+    const result = await applyCollection.find().toArray();
+    res.send(result)
+  })
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
