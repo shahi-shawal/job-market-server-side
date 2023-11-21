@@ -95,27 +95,35 @@ async function run() {
 
   
 //    get jobs in database
+ 
 
-   app.get("/jobs",loger,verifytoken, async(req, res)=>{
-    const filter = req.query
+
+
+   app.get("/jobs", async(req, res)=>{
+    const filter = req.query  
     console.log(filter)
-    console.log("req owner info", req.user);
-    if (!req.user.email) {
-      return res.status(403).send({massage:"forbiden access"})
-    }
-    const query = {
-      job_title:{$regex: filter.search, $options: 'i'}
-    }
+    let query ={}
+    if(filter.search){
+      query = {
+        job_title:{$regex: `${filter.search}`, $options: 'i'}
+      }
+    } 
     const result = await jobCollection.find(query).toArray();
     res.send(result)
 
    })
+  
 
-   app.get("/jobs/:id", async (req, res) => {
+
+   app.get("/jobs/:id",loger,verifytoken, async (req, res) => {
     const id = req.params.id;
     const query = {
       _id: new ObjectId(id),
     };
+    console.log("req owner info", req.user);
+    if (!req.user.email) {
+      return res.status(403).send({massage:"forbiden access"})
+    }
     const result = await jobCollection.findOne(query);
     console.log(result);
     res.send(result);
@@ -158,6 +166,27 @@ async function run() {
     );
     res.send(result);
   });
+
+  
+  app.patch("/jobs/:id", async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updatedUSer = {
+      $inc: {
+        job_applicate_number: 1
+      },
+    };
+    const result = await jobCollection.updateOne(
+      filter,
+      updatedUSer
+    );
+    res.send(result);
+  });
+
+
+
+
+
 
   // update applicats
   // let totalSum = 0;
